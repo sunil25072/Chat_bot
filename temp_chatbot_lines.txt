@@ -1,0 +1,27 @@
+1115:   /* ── Chatbot Container ── */
+1116:   #chatbotContainer {
+1138:   #chatbotContainer.open {
+1144:   #chatbotContainer.maximized {
+1178:   /* ── Responsive Alignments for Compact Chatbot Drawer ── */
+1179:   #chatbotContainer:not(.maximized) .mode-badge,
+1180:   #chatbotContainer:not(.maximized) .status-badge {
+1184:   #chatbotContainer:not(.maximized) header {
+1189:   #chatbotContainer:not(.maximized) #welcome {
+1193:   #chatbotContainer:not(.maximized) #welcome .big-logo {
+1200:   #chatbotContainer:not(.maximized) #welcome h2 {
+1205:   #chatbotContainer:not(.maximized) #welcome p {
+1211:   #chatbotContainer:not(.maximized) .chip-bar {
+1217:   #chatbotContainer:not(.maximized) .chip {
+1222:   #chatbotContainer:not(.maximized) footer {
+1226:   #chatbotContainer:not(.maximized) .footer-meta {
+1231:     #chatbotContainer {
+1272:     z-index: 90; /* Below chatbot (100) but above iframe (0) */
+1392: <!-- Chatbot Panel -->
+1393: <div id="chatbotContainer">
+1500:     localStorage.setItem('systech_chatbot_cfg', JSON.stringify(CFG));
+1739: Calculate chatbot twenty-five two thousand nine sixty seven point seven outlook state of mind debate isconst INSTRUCTIONS = `You are a friendly, helpful, and enthusiastic AI assistant exclusively for Systech Solutions (systechusa.com) 👋.
+1940:   const container = document.getElementById('chatbotContainer');
+1949:   const container = document.getElementById('chatbotContainer');
+1958:   const container = document.getElementById('chatbotContainer');
+1976:   const container = document.getElementById('chatbotContainer');
+1994:     const saved = localStorage.getItem('systech_chatbot_cfg');

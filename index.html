@@ -1,0 +1,2024 @@
+
+​<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Systech AI bot</title>
+<link rel="icon" type="image/png" href="./Screenshot 2026-06-26 110358.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: rgba(255, 255, 255, 0.7);
+    --surface2: rgba(241, 245, 249, 0.55);
+    --border: rgba(15, 23, 42, 0.06);
+    --border2: rgba(59, 130, 246, 0.2);
+    --accent: #4a2b8e;
+    --accent-dim: #2c1a54;
+    --accent-glow: rgba(74, 43, 142, 0.05);
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-dim: #94a3b8;
+    --success: #20b2aa;
+    --warn: #d97706;
+    --rule: rgba(15, 23, 42, 0.03);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Background grid and ambient glows */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(circle 800px at 50% 35%, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle 800px at 50% 35%, black 30%, transparent 80%);
+  }
+  
+  body::after {
+    content: '';
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.04) 0%, transparent 70%);
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.1);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.4);
+  }
+
+  /* ── Modal / Config overlay ── */
+  #configOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: fadeIn 0.25s ease-out;
+  }
+  
+  #configBox {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    padding: 36px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 
+      0 0 0 1px rgba(59, 130, 246, 0.05),
+      0 20px 50px rgba(15, 23, 42, 0.08),
+      0 0 40px rgba(59, 130, 246, 0.03);
+    animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 88vh;
+    overflow-y: auto;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  #configBox::-webkit-scrollbar {
+    width: 5px;
+  }
+  #configBox::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.1);
+    border-radius: 10px;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  
+  .cfg-logo {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+  }
+  
+  #configBox h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.4px;
+    color: #0f172a;
+  }
+  
+  #configBox h2 span {
+    background: linear-gradient(135deg, var(--accent-dim) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .cfg-sub {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+    background: rgba(15, 23, 42, 0.03);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    border-radius: 10px;
+    padding: 5px;
+    overflow: hidden;
+  }
+  
+  .mode-tab {
+    flex: 1;
+    padding: 12px 10px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
+  }
+  
+  .mode-tab:hover {
+    color: #0f172a;
+    background: rgba(15, 23, 42, 0.01);
+  }
+  
+  .mode-tab.active {
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent-dim);
+    border-color: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  }
+  
+  .mode-panel {
+    display: none;
+  }
+  
+  .mode-panel.active {
+    display: block;
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  .info-box {
+    background: rgba(59, 130, 246, 0.03);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .info-box strong {
+    color: #0f172a;
+    font-weight: 600;
+  }
+  
+  .info-box.warn {
+    background: rgba(217, 119, 6, 0.03);
+    border-color: rgba(217, 119, 6, 0.1);
+    border-left-color: var(--warn);
+  }
+  
+  .info-box.warn strong {
+    color: #0f172a;
+  }
+  
+  .info-box svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--accent-dim);
+  }
+  
+  .info-box.warn svg {
+    color: var(--warn);
+  }
+
+  .field-group {
+    margin-bottom: 18px;
+  }
+  
+  .field-group label {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .field-group input, .field-group select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  
+  .field-group input:focus, .field-group select:focus {
+    border-color: var(--accent);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .field-group input::placeholder {
+    color: var(--text-dim);
+  }
+  
+  .field-hint {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    padding-left: 2px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .cfg-divider {
+    border: none;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+    margin: 24px 0 20px;
+  }
+  
+  .cfg-section {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--accent-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .cfg-section::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(15, 23, 42, 0.06);
+  }
+  
+  .cfg-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  #cancelConfigBtn, #saveConfigBtn {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 9px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+  }
+  
+  #cancelConfigBtn {
+    background: rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    color: var(--text-muted);
+  }
+  
+  #cancelConfigBtn:hover {
+    background: rgba(15, 23, 42, 0.1);
+    color: var(--text);
+  }
+  
+  #saveConfigBtn {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+  }
+  
+  #saveConfigBtn:hover {
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+  }
+  
+  #saveConfigBtn:active, #cancelConfigBtn:active {
+    transform: translateY(1px);
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    flex-shrink: 0;
+  }
+  
+  .logo-wrap {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+  }
+  
+  .header-info h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.2px;
+    background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .header-info p {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 2px;
+  }
+  
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .mode-badge {
+    font-size: 9px;
+    color: var(--accent-dim);
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+  }
+  
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9px;
+    color: #334155;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(15, 23, 42, 0.02);
+    border: 1px solid rgba(15, 23, 42, 0.04);
+    border-radius: 6px;
+    padding: 5px 10px;
+  }
+  
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease infinite;
+  }
+  
+  #settingsBtn {
+    width: 32px;
+    height: 32px;
+    background: rgba(15, 23, 42, 0.02);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--text-muted);
+  }
+  
+  #settingsBtn:hover {
+    border-color: rgba(59, 130, 246, 0.2);
+    color: var(--accent-dim);
+    background: rgba(59, 130, 246, 0.05);
+    transform: rotate(45deg);
+  }
+  
+  #settingsBtn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ── Chat ── */
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+    scroll-behavior: smooth;
+  }
+  
+  /* ── Welcome ── */
+  #welcome {
+    margin: auto;
+    text-align: center;
+    max-width: 640px;
+    padding: 40px 20px;
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  #welcome .big-logo {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    border: none;
+    border-radius: 12px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+    position: relative;
+  }
+  
+  #welcome .big-logo::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+    border-radius: 15px;
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.35;
+  }
+  
+  #welcome h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    letter-spacing: -0.6px;
+    color: #0f172a;
+  }
+  
+  #welcome h2 span {
+    background: linear-gradient(135deg, var(--accent-dim) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  #welcome p {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .chip-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+  
+  .chip {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 9px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.01);
+  }
+  
+  .chip::before {
+    content: '✦';
+    color: var(--accent);
+    font-size: 9px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  
+  .chip:hover {
+    border-color: rgba(59, 130, 246, 0.2);
+    color: #0f172a;
+    background: rgba(59, 130, 246, 0.04);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  }
+  
+  .chip:hover::before {
+    transform: scale(1.2) rotate(45deg);
+    color: var(--accent-dim);
+  }
+
+  /* ── Messages ── */
+  .msg-row {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  
+  .msg-row.user {
+    flex-direction: row-reverse;
+  }
+  
+  .msg-row.bot {
+    margin-right: auto;
+  }
+  
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.75); }
+  }
+
+  @keyframes cursorBlink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .typing-cursor {
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+  
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .avatar.u {
+    background: rgba(15, 23, 42, 0.03);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    color: var(--text-muted);
+  }
+  
+  .avatar.b {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+  }
+  
+  .bubble {
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 11.5px;
+    line-height: 1.7;
+    max-width: calc(100% - 46px);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
+  }
+  
+  .msg-row.user .bubble {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-top-right-radius: 4px;
+    color: #0f172a;
+  }
+  
+  .msg-row.bot .bubble {
+    background: rgba(241, 245, 249, 0.5);
+    border: 1px solid rgba(15, 23, 42, 0.04);
+    border-left: 2px solid var(--accent);
+    border-top-left-radius: 4px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #0f172a;
+  }
+  
+  .bubble strong {
+    color: var(--accent-dim);
+    font-weight: 600;
+  }
+  
+  .bubble em {
+    color: var(--text-muted);
+  }
+  
+  .bubble code {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--accent-dim);
+  }
+  
+  .bubble ul, .bubble ol {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+  
+  .bubble li {
+    margin: 4px 0;
+  }
+  
+  .bubble li::marker {
+    color: var(--accent);
+  }
+  
+  .bubble p {
+    margin: 8px 0;
+  }
+  
+  .bubble p:first-child { margin-top: 0; }
+  .bubble p:last-child { margin-bottom: 0; }
+  
+  .bubble h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: var(--accent-dim);
+    font-weight: 700;
+    margin: 18px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  
+  .bubble h3:first-child { margin-top: 0; }
+  .bubble h3::before {  color: var(--text-dim); }
+  
+  .bubble hr {
+    border: none;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+    margin: 14px 0;
+  }
+  
+  .bubble a {
+    color: var(--accent-dim);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    transition: all 0.15s;
+  }
+  
+  .bubble a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(59, 130, 246, 0.02);
+  }
+
+  .sources-wrap {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+  }
+  
+  .sources-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .source-item {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(15, 23, 42, 0.04);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .source-item:hover {
+    background: rgba(59, 130, 246, 0.04);
+    border-color: rgba(59, 130, 246, 0.15);
+  }
+  
+  .source-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-right: 6px;
+  }
+  
+  .source-item a {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-decoration: none;
+    word-break: break-all;
+    line-height: 1.4;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+  }
+  
+  .source-item a:hover {
+    color: var(--accent-dim);
+  }
+  
+  /* ── Typing ── */
+  .thinking-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .typing-bubble {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 18px;
+    background: rgba(241, 245, 249, 0.5);
+    border: 1px solid rgba(15, 23, 42, 0.04);
+    border-left: 2px solid var(--accent);
+    border-radius: 12px;
+    width: fit-content;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.4s ease infinite;
+    opacity: 0.6;
+  }
+  
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+  
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: .4; }
+    40% { transform: translateY(-6px); opacity: 1; }
+  }
+  
+  .search-status {
+    font-size: 9px;
+    color: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: blink 1.5s ease infinite;
+    padding-left: 4px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+  
+  .search-status svg {
+    width: 13px;
+    height: 13px;
+    color: var(--accent);
+  }
+
+  /* ── Footer ── */
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 24px 20px 28px;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  
+  footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    top: -40px;
+    background: linear-gradient(to top, var(--bg) 40%, transparent);
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 24px;
+    padding: 8px 12px;
+    box-shadow: 
+      0 10px 30px rgba(15, 23, 42, 0.03),
+      0 0 1px rgba(15, 23, 42, 0.04);
+    transition: all 0.25s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .input-row:focus-within {
+    border-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 
+      0 10px 30px rgba(15, 23, 42, 0.04),
+      0 0 15px rgba(59, 130, 246, 0.1);
+    background: #ffffff;
+  }
+  
+  #userInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: #0f172a;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    min-height: 24px;
+    max-height: 120px;
+  }
+  
+  #userInput::placeholder {
+    color: var(--text-dim);
+  }
+  
+  #sendBtn {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+  }
+  
+  #sendBtn:hover:not(:disabled) {
+    background: #34d399;
+    transform: scale(1.05) rotate(-10deg);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+  
+  #sendBtn:disabled {
+    opacity: 0.15;
+    cursor: not-allowed;
+    background: rgba(15, 23, 42, 0.05);
+    box-shadow: none;
+  }
+  
+  #sendBtn svg {
+    width: 14px;
+    height: 14px;
+    color: #ffffff;
+    transform: translate(1px, -0.5px);
+    stroke-width: 2.5;
+  }
+  
+  .footer-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  .footer-meta span, .footer-badge {
+    font-size: 9px;
+    color: var(--text-dim);
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.2px;
+  }
+  
+  .footer-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-transform: uppercase;
+  }
+  
+  .footer-badge svg {
+    width: 11px;
+    height: 11px;
+    color: var(--accent-dim);
+  }
+  
+  .sep {
+    color: rgba(15, 23, 42, 0.08);
+  }
+  
+  /* ── Background Website Frame ── */
+  #backgroundWebsite {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    z-index: 1;
+    background: #ffffff;
+  }
+  
+  /* ── Floating Avatar Trigger ── */
+  #chatTrigger {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    border-radius: 100px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    z-index: 99;
+    color: #0f172a;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+
+  
+  #chatTrigger.visible {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  #chatTrigger svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.2;
+    color: #ffffff;
+  }
+  
+  #chatTrigger:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+  }
+  
+  .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(16, 185, 129, 0.4);
+    animation: triggerPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes triggerPulse {
+    0% { transform: scale(0.9); opacity: 1; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  /* ── Chatbot Container ── */
+  #chatbotContainer {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 460px;
+    height: 85vh;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 
+      0 10px 30px rgba(15, 23, 42, 0.08),
+      0 1px 3px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(120%) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  #chatbotContainer.open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  #chatbotContainer.maximized {
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+  }
+
+  #closeBtn, #newChatBtn {
+    width: 32px;
+    height: 32px;
+    background: rgba(15, 23, 42, 0.02);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--text-muted);
+  }
+
+  #closeBtn:hover, #newChatBtn:hover {
+    border-color: rgba(16, 185, 129, 0.2);
+    color: var(--accent-dim);
+    background: rgba(16, 185, 129, 0.05);
+  }
+
+  #closeBtn svg, #newChatBtn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+  
+  /* ── Responsive Alignments for Compact Chatbot Drawer ── */
+  #chatbotContainer:not(.maximized) .mode-badge,
+  #chatbotContainer:not(.maximized) .status-badge {
+    display: none !important;
+  }
+  
+  #chatbotContainer:not(.maximized) header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  
+  #chatbotContainer:not(.maximized) #welcome {
+    padding: 16px 12px;
+  }
+
+  #chatbotContainer:not(.maximized) #welcome .big-logo {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  #chatbotContainer:not(.maximized) #welcome h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  #chatbotContainer:not(.maximized) #welcome p {
+    font-size: 9px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  #chatbotContainer:not(.maximized) .chip-bar {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    max-width: 100%;
+  }
+
+  #chatbotContainer:not(.maximized) .chip {
+    padding: 10px 12px;
+    font-size: 11.5px;
+  }
+  
+  #chatbotContainer:not(.maximized) footer {
+    padding: 12px 16px 16px;
+  }
+  
+  #chatbotContainer:not(.maximized) .footer-meta {
+    margin-top: 8px;
+  }
+  
+  @media (max-width: 520px) {
+    #chatbotContainer {
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      border-radius: 0 !important;
+      max-height: 100% !important;
+    }
+    #chatTrigger {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    border-radius: 100px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    z-index: 99;
+    color: #0f172a;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+
+  }
+
+#chatBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 90; /* Below chatbot (100) but above iframe (0) */
+    display: none;
+    background: transparent;
+}
+#chatBackdrop.active {
+    display: block;
+}
+
+
+.user-avatar {
+    background: transparent !important;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+
+
+.search-status {
+    display: none !important;
+}
+
+</style>
+</head>
+<body>
+  <div id="chatBackdrop" onclick="closeChat()"></div>
+
+<!-- Background Website Frame -->
+<iframe id="backgroundWebsite" src="https://systechusa.com/"></iframe>
+
+<!-- Chat Trigger Button (Floating Avatar) -->
+<div id="chatTrigger" title="Ask Bot" onclick="openChat()">
+  <img src="https://systechusa.com/wp-content/uploads/2019/08/systech-solution-inc-logo.png" style="height: 18px; object-fit: contain; pointer-events: none;">
+  <span style="font-weight: 500; font-size: 14px; white-space: nowrap; pointer-events: none;">Ask Bot</span>
+</div>
+
+<!-- ── Config Modal ── -->
+<div id="configOverlay">
+  <div id="configBox">
+    <div class="cfg-logo">SY</div>
+    <h2>Systech <span>AI Assistant</span></h2>
+    <p class="cfg-sub">// choose a mode and enter your azure openai credentials</p>
+
+    <!-- Mode tabs -->
+    <div class="mode-tabs">
+      <div class="mode-tab active" onclick="switchTab('v1')" id="tab-v1">
+        RESPONSES API V1
+        <div style="font-size:9px;font-weight:400;color:var(--text-dim);margin-top:3px;">api-version=preview</div>
+      </div>
+      <div class="mode-tab" onclick="switchTab('chat')" id="tab-chat">
+        CHAT COMPLETIONS + BING
+        <div style="font-size:9px;font-weight:400;color:var(--text-dim);margin-top:3px;">CORS-safe RAG</div>
+      </div>
+    </div>
+
+    <!-- Mode 1: Responses API v1 -->
+    <div class="mode-panel active" id="panel-v1">
+      <div class="info-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Uses <strong>/openai/v1/responses</strong> with <strong>web_search_preview</strong>. Bing runs server-side — no CORS. Requires web_search to be enabled in your Azure subscription.</span>
+      </div>
+      <div class="field-group">
+        <label>Endpoint</label>
+        <input id="v1_endpoint" type="text" placeholder="https://your-resource.openai.azure.com"/>
+        <div class="field-hint">AZURE_OPENAI_ENDPOINT</div>
+      </div>
+      <div class="field-group">
+        <label>API Key</label>
+        <input id="v1_apikey" type="password" placeholder="••••••••••••••••••••••••••••••••"/>
+        <div class="field-hint">AZURE_OPENAI_API_KEY</div>
+      </div>
+      <div class="field-group">
+        <label>Model Deployment Name</label>
+        <input id="v1_model" type="text" placeholder="gpt-4o"/>
+        <div class="field-hint">AZURE_OPENAI_MODEL</div>
+      </div>
+    </div>
+
+    <!-- Mode 2: Chat Completions + Bing via proxy -->
+    <div class="mode-panel" id="panel-chat">
+      <div class="info-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Uses <strong>Chat Completions API</strong> + your <strong>Bing Key</strong>. Bing call is routed through a CORS proxy (corsproxy.io) — only your query goes through it, not your keys.</span>
+      </div>
+      <div class="cfg-section">Azure OpenAI</div>
+      <div class="field-group">
+        <label>Endpoint</label>
+        <input id="chat_endpoint" type="text" placeholder="https://your-resource.openai.azure.com"/>
+      </div>
+      <div class="field-group">
+        <label>API Key</label>
+        <input id="chat_apikey" type="password" placeholder="••••••••••••••••••••••••••••••••"/>
+      </div>
+      <div class="field-group">
+        <label>Model Deployment Name</label>
+        <input id="chat_model" type="text" placeholder="gpt-4o"/>
+      </div>
+      <div class="field-group">
+        <label>API Version</label>
+        <input id="chat_version" type="text" placeholder="2024-12-01-preview"/>
+        <div class="field-hint">OPENAI_API_VERSION — any Chat Completions version works</div>
+      </div>
+      <hr class="cfg-divider"/>
+      <div class="cfg-section">Bing Web Search v7</div>
+      <div class="field-group">
+        <label>Bing Search API Key</label>
+        <input id="chat_bing" type="password" placeholder="••••••••••••••••••••••••••••••••"/>
+        <div class="field-hint">Ocp-Apim-Subscription-Key</div>
+      </div>
+      <div class="info-box warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>The Bing key is sent to corsproxy.io as a request header to proxy the Bing call. Do not use a production key.</span>
+      </div>
+    </div>
+
+    <div class="cfg-buttons">
+      <button type="button" id="cancelConfigBtn" onclick="cancelConfig()">Cancel</button>
+      <button type="button" id="saveConfigBtn" onclick="saveConfig()">Launch Assistant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chatbot Panel -->
+<div id="chatbotContainer">
+  <!-- ── Header ── -->
+  <header>
+    <div style="display:flex; align-items:center; gap: 12px;">
+      <img src="https://systechusa.com/wp-content/uploads/2019/08/systech-solution-inc-logo.png" alt="Systech" style="height:24px; object-fit:contain;">
+      <h2 style="font-size: 16px; margin: 0; font-weight: 600; color: var(--text);">Systech AI Bot</h2>
+    </div>
+    <div class="header-right">
+      <div class="status-badge"><div class="status-dot"></div>Online</div>
+      <button id="newChatBtn" onclick="newChat()" title="New Chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <button id="closeBtn" onclick="closeChat()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Chat ── -->
+  <div id="chat">
+    <div id="welcome">
+      <h2>Ask anything about <span>Systech</span></h2>
+      <div class="chip-bar">
+        <div class="chip" onclick="useChip(this)">Databricks Lakebase services</div>
+        <div class="chip" onclick="useChip(this)">What is DBShift™?</div>
+        <div class="chip" onclick="useChip(this)">WizarD™ capabilities</div>
+        <div class="chip" onclick="useChip(this)">Enterprise AI offerings</div>
+        <div class="chip" onclick="useChip(this)">Snowflake partnership</div>
+        <div class="chip" onclick="useChip(this)">Industries Systech serves</div>
+        <div class="chip" onclick="useChip(this)">DBShift migration metrics</div>
+        <div class="chip" onclick="useChip(this)">Managed services offered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="input-row">
+      <textarea id="userInput" rows="1"
+        placeholder="Ask about Systech's services, products, partners…"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"></textarea>
+      <button id="sendBtn" onclick="sendMessage()" title="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    
+    </div>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════
+let activeTab = 'v1';
+
+// -------------------------------------------------------------
+// OPTIONAL: Hardcode your credentials here to bypass the config overlay.
+// -------------------------------------------------------------
+let CFG = {
+  mode: 'backend',
+  endpoint: 'https://systechinternalapp.openai.azure.com/',
+  apikey: 'YOUR_AZURE_API_KEY',
+  model: 'gpt-5.4',
+  version: '',
+  bing: ''
+};
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-v1').classList.toggle('active', tab === 'v1');
+  document.getElementById('tab-chat').classList.toggle('active', tab === 'chat');
+  document.getElementById('panel-v1').classList.toggle('active', tab === 'v1');
+  document.getElementById('panel-chat').classList.toggle('active', tab === 'chat');
+}
+
+function saveConfig() {
+  if (activeTab === 'v1') {
+    const e  = document.getElementById('v1_endpoint').value.trim().replace(/\/+$/, '');
+    const ak = document.getElementById('v1_apikey').value.trim();
+    const m  = document.getElementById('v1_model').value.trim();
+    if (!e || !ak || !m) { alert('Please fill in Endpoint, API Key, and Model.'); return; }
+    CFG = { mode: 'v1', endpoint: e, apikey: ak, model: m };
+    if(document.getElementById('headerModeBadge')) document.getElementById('headerModeBadge').textContent = 'Responses API v1';
+  } else {
+    const e  = document.getElementById('chat_endpoint').value.trim().replace(/\/+$/, '');
+    const ak = document.getElementById('chat_apikey').value.trim();
+    const m  = document.getElementById('chat_model').value.trim();
+    const v  = document.getElementById('chat_version').value.trim();
+    const bk = document.getElementById('chat_bing').value.trim();
+    if (!e || !ak || !m || !v || !bk) { alert('Please fill in all five fields.'); return; }
+    CFG = { mode: 'chat', endpoint: e, apikey: ak, model: m, version: v, bing: bk };
+    if(document.getElementById('headerModeBadge')) document.getElementById('headerModeBadge').textContent = 'Chat + Bing RAG';
+  }
+
+  // Save to localStorage so configuration persists across page reloads
+  try {
+    localStorage.setItem('systech_chatbot_cfg', JSON.stringify(CFG));
+  } catch (err) {
+    console.error('Failed to save configuration to localStorage:', err);
+  }
+
+  document.getElementById('configOverlay').style.display = 'none';
+}
+
+function openConfig() { return; 
+  if (CFG.mode === 'v1') {
+    document.getElementById('v1_endpoint').value = CFG.endpoint || '';
+    document.getElementById('v1_apikey').value   = CFG.apikey   || '';
+    document.getElementById('v1_model').value    = CFG.model    || '';
+    switchTab('v1');
+  } else if (CFG.mode === 'chat') {
+    document.getElementById('chat_endpoint').value = CFG.endpoint || '';
+    document.getElementById('chat_apikey').value   = CFG.apikey   || '';
+    document.getElementById('chat_model').value    = CFG.model    || '';
+    document.getElementById('chat_version').value  = CFG.version  || '';
+    document.getElementById('chat_bing').value     = CFG.bing     || '';
+    switchTab('chat');
+  } else if (CFG.mode === 'backend') {
+    document.getElementById('configOverlay').style.display = 'none';
+    return;
+  }
+  document.getElementById('configOverlay').style.display = 'flex';
+}
+
+function cancelConfig() {
+  document.getElementById('configOverlay').style.display = 'none';
+  if (!CFG.apikey) {
+    closeChat();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+
+
+
+
+function newChat() {
+  document.getElementById('chat').innerHTML = `
+    <div id="welcome">
+      <h2>Ask anything about <span>Systech</span></h2>
+      <div class="chip-bar">
+        <div class="chip" onclick="useChip(this)">Databricks Lakebase services</div>
+        <div class="chip" onclick="useChip(this)">What is DBShift™?</div>
+        <div class="chip" onclick="useChip(this)">WizarD™ capabilities</div>
+        <div class="chip" onclick="useChip(this)">Enterprise AI offerings</div>
+        <div class="chip" onclick="useChip(this)">Snowflake partnership</div>
+        <div class="chip" onclick="useChip(this)">Industries Systech serves</div>
+        <div class="chip" onclick="useChip(this)">DBShift migration metrics</div>
+        <div class="chip" onclick="useChip(this)">Managed services offered</div>
+      </div>
+    </div>
+  `;
+  chatHistory = [];
+}
+
+// ══════════════════════════════════════════════════════════════════
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 104) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function useChip(el) { document.getElementById('userInput').value = el.innerText.trim(); sendMessage(); }
+function removeWelcome() { const w = document.getElementById('welcome'); if (w) w.remove(); }
+function scrollChat() { const c = document.getElementById('chat'); c.scrollTop = c.scrollHeight; }
+
+// ══════════════════════════════════════════════════════════════════
+// MARKDOWN
+// ══════════════════════════════════════════════════════════════════
+function renderMd(text) {
+  text = text.replace(/\r\n/g, '\n');
+
+  // ── Headers ──
+  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  text = text.replace(/^## (.+)$/gm,  '<h3>$1</h3>');
+  text = text.replace(/^# (.+)$/gm,   '<h3>$1</h3>');
+
+  // ── Bold / Italic ──
+  text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  text = text.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
+  text = text.replace(/\*(.+?)\*/g,          '<em>$1</em>');
+
+  // ── Inline code ──
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // ── HR ──
+  text = text.replace(/^---$/gm, '<hr>');
+
+  // ── Markdown links: [label](url) → clickable anchor ──
+  // Handles both plain [text](url) and wrapped ([text](url))
+  text = text.replace(/\(?\[([^\]]+)\]\((https?:\/\/[^)]+)\)\)?/g,
+    '<a href="$2" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">$1</a>');
+
+  // ── Clean up orphaned bare ([domain.com]) citation remnants ──
+  // e.g.  ([systechusa.com])  left after link conversion
+  text = text.replace(/\(\[([^\]]+)\]\)/g, '');
+  // Trailing double-parens or space-paren left overs
+  text = text.replace(/\s*\(\s*\)/g, '');
+
+  // ── Line-by-line ──
+  const lines = text.split('\n');
+  let out = '', inUL = false, inOL = false;
+  for (let line of lines) {
+    if (/^[\*\-] (.+)/.test(line)) {
+      if (inOL) { out += '</ol>'; inOL = false; }
+      if (!inUL) { out += '<ul>'; inUL = true; }
+      out += `<li>${line.replace(/^[\*\-] /, '')}</li>`;
+    } else if (/^\d+\. (.+)/.test(line)) {
+      if (inUL) { out += '</ul>'; inUL = false; }
+      if (!inOL) { out += '<ol>'; inOL = true; }
+      out += `<li>${line.replace(/^\d+\. /, '')}</li>`;
+    } else {
+      if (inUL) { out += '</ul>'; inUL = false; }
+      if (inOL) { out += '</ol>'; inOL = false; }
+      if      (line.trim() === '')                                     out += '<br>';
+      else if (line.startsWith('<h3>') || line.startsWith('<hr>'))     out += line;
+      else                                                              out += `<p>${line}</p>`;
+    }
+  }
+  if (inUL) out += '</ul>';
+  if (inOL) out += '</ol>';
+  return out;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MESSAGE RENDER
+// ══════════════════════════════════════════════════════════════════
+function addMsg(role, text, sources) {
+  removeWelcome();
+  const chat = document.getElementById('chat');
+  const row  = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  const av  = document.createElement('div');
+  av.className  = `avatar ${role === 'user' ? 'u' : 'b'}`;
+  if(role === 'user') { av.style.background = 'transparent'; av.style.border = 'none'; av.innerHTML = '<img src=\"https://i.pinimg.com/736x/53/b9/fb/53b9fb994aaf9fee850bbc6273d30b0c.jpg\" style=\"width:100%; height:100%; object-fit:cover; border-radius:8px;\">'; } else { av.style.background = '#ffffff'; av.innerHTML = '<img src="https://systechusa.com/wp-content/uploads/2019/08/systech-solution-inc-logo.png" style="width:100%; height:100%; object-fit:contain; border-radius:4px;">'; }
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  if (role === 'user') {
+    bub.textContent = text;
+  } else {
+    bub.innerHTML = renderMd(text);
+    if (sources && sources.length > 0) {
+      const seen = new Set();
+      const unique = sources.filter(s => { if (seen.has(s.url)) return false; seen.add(s.url); return true; });
+      const sw = document.createElement('div');
+      sw.className = 'sources-wrap';
+      sw.innerHTML = `<div class="sources-label">Sources</div>`
+        + unique.map(s => `<div class="source-item"><div class="source-dot"></div><a href="${s.url}" target="_blank" rel="noopener">${s.title || s.url}</a></div>`).join('');
+      bub.appendChild(sw);
+    }
+  }
+  row.appendChild(av); row.appendChild(bub);
+  chat.appendChild(row); scrollChat();
+}
+
+function streamBotMsg(text, sources) {
+  return new Promise((resolve) => {
+    removeWelcome();
+    const chat = document.getElementById('chat');
+    const row  = document.createElement('div');
+    row.className = 'msg-row bot';
+    const av  = document.createElement('div');
+    av.className  = 'avatar b';
+    av.style.background = '#ffffff'; av.innerHTML = '<img src="https://systechusa.com/wp-content/uploads/2019/08/systech-solution-inc-logo.png" style="width:100%; height:100%; object-fit:contain; border-radius:4px;">';
+    const bub = document.createElement('div');
+    bub.className = 'bubble';
+    
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    cursor.style.color = 'var(--accent)';
+    cursor.style.marginLeft = '2px';
+    cursor.style.display = 'inline-block';
+    cursor.style.animation = 'cursorBlink 1s step-end infinite';
+    cursor.textContent = '▋';
+    
+    row.appendChild(av);
+    row.appendChild(bub);
+    chat.appendChild(row);
+    scrollChat();
+    
+    let i = 0;
+    const speed = 12;
+    const charsPerStep = 3;
+    
+    function typeWriter() {
+      if (i < text.length) {
+        i += charsPerStep;
+        if (i > text.length) i = text.length;
+        const currentText = text.substring(0, i);
+        bub.innerHTML = renderMd(currentText);
+        bub.appendChild(cursor);
+        scrollChat();
+        setTimeout(typeWriter, speed);
+      } else {
+        cursor.remove();
+        bub.innerHTML = renderMd(text);
+        if (sources && sources.length > 0) {
+          const seen = new Set();
+          const unique = sources.filter(s => { if (seen.has(s.url)) return false; seen.add(s.url); return true; });
+          const sw = document.createElement('div');
+          sw.className = 'sources-wrap';
+          sw.innerHTML = `<div class="sources-label">Sources</div>`
+            + unique.map(s => `<div class="source-item"><div class="source-dot"></div><a href="${s.url}" target="_blank" rel="noopener">${s.title || s.url}</a></div>`).join('');
+          bub.appendChild(sw);
+        }
+        scrollChat();
+        resolve();
+      }
+    }
+    typeWriter();
+  });
+}
+
+function showTyping(msg) {
+  removeWelcome();
+  const chat = document.getElementById('chat');
+  const row  = document.createElement('div');
+  row.className = 'msg-row bot'; row.id = 'typing-row';
+  const av = document.createElement('div');
+  av.className = 'avatar b'; av.style.background = '#ffffff'; av.innerHTML = '<img src="https://systechusa.com/wp-content/uploads/2019/08/systech-solution-inc-logo.png" style="width:100%; height:100%; object-fit:contain; border-radius:4px;">';
+  const wrap = document.createElement('div');
+  wrap.className = 'thinking-wrap';
+  wrap.innerHTML = `<div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="search-status" id="search-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      ${msg}</div>`;
+  row.appendChild(av); row.appendChild(wrap);
+  chat.appendChild(row); scrollChat();
+}
+function updateStatus(msg) {
+  const el = document.getElementById('search-label');
+  if (el) el.innerHTML = '';;
+}
+function removeTyping() { const t = document.getElementById('typing-row'); if (t) t.remove(); }
+
+// ══════════════════════════════════════════════════════════════════
+// SYSTEM PROMPT
+// ══════════════════════════════════════════════════════════════════
+const INSTRUCTIONS = `You are a friendly, helpful, and enthusiastic AI assistant exclusively for Systech Solutions (systechusa.com) 👋.
+
+Your ONLY purpose is to answer questions about Systech Solutions — services, products (DBShift™, WizarD™, Dopplr™), partnerships (Databricks Lakebase, Snowflake, Azure, AWS), industries, case studies, and anything on their website.
+
+IMPORTANT: When you search the web, ALWAYS prefix your query with "site:systechusa.com" so every result comes exclusively from Systech's website.
+
+Be specific: reference product names, partner tiers, and metrics (e.g. 7x faster, 70% cost savings, 100% automation) exactly as they appear on the site.
+
+Response Guidelines:
+1. Tone: Warm, friendly, approachable, and professional. Use happy emojis (like 😊, 🚀, 💡, 💻, ✨, etc.) to keep it engaging!
+2. Length: Medium length. Do NOT write long, dense paragraphs. Break down ideas into concise sentences and easy-to-read bullet lists.
+3. Formatting: Use ### headers and clean bullet lists.
+
+If a question is unrelated to Systech Solutions, respond: "I can only answer questions about Systech Solutions. Feel free to ask about their services, products, or capabilities! 😊"`;
+
+// ══════════════════════════════════════════════════════════════════
+// MODE 1 — Responses API v1  (api-version=preview, no dated string)
+// ══════════════════════════════════════════════════════════════════
+let prevResponseId = null;
+
+async function callResponsesV1(query) {
+  // v1 GA endpoint — uses literal "preview" not a dated version
+  const baseUrl = CFG.endpoint.replace(/\/+$/, '');
+  const url = `${baseUrl}/openai/v1/responses?api-version=preview`;
+  const body = {
+    model: CFG.model,
+    instructions: INSTRUCTIONS,
+    tools: [{ type: 'web_search_preview', user_location: { type: 'approximate', country: 'US' } }],
+    input: `Please search site:systechusa.com and answer: ${query}`,
+    ...(prevResponseId ? { previous_response_id: prevResponseId } : {}),
+    max_output_tokens: 1500,
+    temperature: 0.4
+  };
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'api-key': CFG.apikey }, body: JSON.stringify(body) });
+  if (!res.ok) { const t = await res.text(); throw new Error(`Responses API ${res.status}: ${t}`); }
+  const data = await res.json();
+  if (data.id) prevResponseId = data.id;
+
+  let text = data.output_text || '';
+  let sources = [];
+  for (const item of (data.output || [])) {
+    if (item.type === 'message' && item.role === 'assistant') {
+      for (const block of (item.content || [])) {
+        if (block.type === 'output_text') {
+          if (!text) text = block.text || '';
+          for (const ann of (block.annotations || [])) {
+            if (ann.type === 'url_citation' && ann.url) sources.push({ url: ann.url, title: ann.title || ann.url });
+          }
+        }
+      }
+    }
+  }
+  return { text, sources };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MODE 2 — Chat Completions + Bing via CORS proxy
+// ══════════════════════════════════════════════════════════════════
+let chatHistory = [];
+
+async function bingSearchProxy(query) {
+  // Route through corsproxy.io — only the query string and result snippets pass through, NOT the API key
+  // We encode the Bing key as a URL param via a GET request to avoid header issues
+  // corsproxy.io forwards all headers, so the key goes as a header through the proxy
+  const bingUrl = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent('site:systechusa.com ' + query)}&count=5&responseFilter=Webpages&textDecorations=false`;
+  const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(bingUrl)}`;
+
+  const res = await fetch(proxyUrl, {
+    headers: {
+      'Ocp-Apim-Subscription-Key': CFG.bing,
+      'x-request-headers': JSON.stringify({ 'Ocp-Apim-Subscription-Key': CFG.bing })
+    }
+  });
+  if (!res.ok) throw new Error(`Bing proxy error ${res.status}`);
+  const data = await res.json();
+  return ((data.webPages && data.webPages.value) || []).map(p => ({
+    title: p.name.replace(/<[^>]+>/g, ''),
+    url: p.url,
+    snippet: p.snippet.replace(/<[^>]+>/g, '')
+  }));
+}
+
+async function callChatCompletions(results, query) {
+  const baseUrl = CFG.endpoint.replace(/\/+$/, '');
+  const url = `${baseUrl}/openai/deployments/${CFG.model}/chat/completions?api-version=${CFG.version}`;
+  const contextBlock = results.length > 0
+    ? `=== LIVE SEARCH RESULTS FROM systechusa.com ===\n`
+      + results.map((r, i) => `[${i+1}] ${r.title}\nURL: ${r.url}\nExcerpt: ${r.snippet}`).join('\n\n')
+      + `\n=== END ===`
+    : `No results found on systechusa.com for this query.`;
+
+  const messages = [
+    { role: 'system', content: INSTRUCTIONS },
+    ...chatHistory.slice(-8),
+    { role: 'user', content: `${contextBlock}\n\nUser question: ${query}\n\nAnswer using only the systechusa.com information above.` }
+  ];
+
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'api-key': CFG.apikey }, body: JSON.stringify({ messages, max_tokens: 1200, temperature: 0.4 }) });
+  if (!res.ok) { const t = await res.text(); throw new Error(`Chat Completions ${res.status}: ${t}`); }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+async function callBackend(query) {
+  const url = 'http://127.0.0.1:8000/chat';
+  const messages = [
+    ...chatHistory.slice(-8),
+    { role: 'user', content: query }
+  ];
+
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages }) });
+  if (!res.ok) { const t = await res.text(); throw new Error(`Backend Error ${res.status}: ${t}`); }
+  const data = await res.json();
+  return data.response;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MAIN SEND
+// ══════════════════════════════════════════════════════════════════
+let busy = false;
+
+async function sendMessage() {
+  const inp   = document.getElementById('userInput');
+  const query = inp.value.trim();
+  if (!query || busy) return;
+  if (!CFG.apikey) { alert('Please configure your credentials first.'); openConfig(); return; }
+
+  inp.value = ''; inp.style.height = 'auto';
+  busy = true;
+  document.getElementById('sendBtn').disabled = true;
+  addMsg('user', query);
+
+  showTyping('');
+
+  try {
+    let text = '', sources = [];
+
+    if (CFG.mode === 'v1') {
+      // ── Responses API v1 ────────────────────────
+      updateStatus();
+      const result = await callResponsesV1(query);
+      text = result.text; sources = result.sources;
+
+    } else if (CFG.mode === 'backend') {
+      // ── Python Backend ────────────────────────
+      
+      text = await callBackend(query);
+      chatHistory.push({ role: 'user', content: query });
+      chatHistory.push({ role: 'assistant', content: text });
+      if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+      sources = [];
+      
+    } else {
+      // ── Chat Completions + Bing RAG ─────────────
+      updateStatus();
+      const results = await bingSearchProxy(query);
+      sources = results.slice(0, 4);
+
+      updateStatus();
+      text = await callChatCompletions(results, query);
+      chatHistory.push({ role: 'user', content: query });
+      chatHistory.push({ role: 'assistant', content: text });
+      if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+    }
+
+    removeTyping();
+
+    if (text) {
+      await streamBotMsg(text, sources);
+    } else {
+      await streamBotMsg('### No answer found\n\nNo relevant information was found on systechusa.com for this query. Try rephrasing.', []);
+    }
+
+  } catch (err) {
+    removeTyping();
+
+    // Build a helpful, specific error message
+    let hint = '';
+    const msg = err.message;
+    if (msg.includes('API version not supported') || msg.includes('400')) {
+      hint = `\n\n**Fix:** For the Responses API v1, the correct version is the literal string \`preview\` — not a dated string like \`2025-03-01-preview\`. This is already set automatically in Mode 1.`;
+    } else if (msg.includes('web_search') || msg.includes('tool') || msg.includes('not enabled')) {
+      hint = `\n\n**Fix:** The \`web_search_preview\` tool is not enabled for your Azure subscription. Switch to **Chat Completions + Bing** mode in ⚙️ Settings.`;
+    } else if (msg.includes('401') || msg.includes('403')) {
+      hint = `\n\n**Fix:** Authentication failed. Verify your API key in ⚙️ Settings.`;
+    } else if (msg.includes('404')) {
+      hint = `\n\n**Fix:** Endpoint or deployment not found. Check your endpoint URL and model name in ⚙️ Settings.`;
+    } else if (msg.includes('CORS') || msg.includes('Failed to fetch')) {
+      hint = `\n\n**Fix:** CORS error on Bing. Switch to **Responses API v1** mode which runs Bing server-side, or check your network/proxy.`;
+    }
+
+    addMsg('bot', `### ⚠️ Error\n\n${msg}${hint}`, []);
+    console.error('[Systech Bot]', err);
+  }
+
+  busy = false;
+  document.getElementById('sendBtn').disabled = false;
+  inp.focus();
+}
+
+function openChat() {
+  const container = document.getElementById('chatbotContainer');
+  const trigger = document.getElementById('chatTrigger');
+  container.classList.add('open');
+  trigger.classList.remove('visible');
+  const backdrop = document.getElementById("chatBackdrop");
+  if (backdrop) backdrop.classList.add("active");
+}
+
+function closeChat() {
+  const container = document.getElementById('chatbotContainer');
+  const trigger = document.getElementById('chatTrigger');
+  container.classList.remove('open');
+  trigger.classList.add('visible');
+  const backdrop = document.getElementById("chatBackdrop");
+  if (backdrop) backdrop.classList.remove("active");
+}
+
+function toggleMaximize() {
+  const container = document.getElementById('chatbotContainer');
+  const maxIcon = document.getElementById('maxIcon');
+  const restoreIcon = document.getElementById('restoreIcon');
+  const isMax = container.classList.toggle('maximized');
+  if (isMax) {
+    maxIcon.style.display = 'none';
+    restoreIcon.style.display = 'block';
+  } else {
+    maxIcon.style.display = 'block';
+    restoreIcon.style.display = 'none';
+  }
+  autoResize(document.getElementById('userInput'));
+  scrollChat();
+}
+
+
+
+function handleOutsideClick(event) {
+  const container = document.getElementById('chatbotContainer');
+  const trigger = document.getElementById('chatTrigger');
+  
+  if (container && container.classList.contains('open')) {
+    if (!container.contains(event.target) && (!trigger || !trigger.contains(event.target))) {
+      closeChat();
+    }
+  }
+}
+document.addEventListener('click', handleOutsideClick);
+document.addEventListener('touchstart', handleOutsideClick);
+
+
+window.addEventListener('load', () => {
+  // Load configuration from localStorage if present
+  // (Commented out to ensure hardcoded credentials in the code are always used)
+  /*
+  try {
+    let saved = localStorage.getItem('systech_chatbot_cfg');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.apikey && parsed.endpoint && parsed.model) {
+        CFG = parsed;
+      }
+    }
+    CFG.mode = 'backend';
+    CFG.mode = 'backend';
+  } catch (err) {
+    console.error('Failed to retrieve configuration from localStorage:', err);
+  }
+  */
+
+  // If configuration is active (hardcoded or from localStorage), close overlay and update badges
+  if (CFG.apikey && CFG.endpoint && CFG.model) {
+    document.getElementById('configOverlay').style.display = 'none';
+    if (CFG.mode === 'v1') {
+      if(document.getElementById('headerModeBadge')) document.getElementById('headerModeBadge').textContent = 'Responses API v1';
+    } else {
+      if(document.getElementById('headerModeBadge')) document.getElementById('headerModeBadge').textContent = 'Chat + Bing RAG';
+    }
+  }
+
+  setTimeout(() => {
+    openChat();
+  }, 2000);
+});
+</script>
+</body>
+</html>
