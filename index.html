@@ -1115,8 +1115,9 @@
   /* ── Chatbot Container ── */
   #chatbotContainer {
     position: fixed;
-    right: 24px;
-    bottom: 24px;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, 100%) scale(0.9);
     width: 460px;
     height: 85vh;
     background: var(--bg);
@@ -1130,13 +1131,12 @@
     z-index: 100;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(120%) scale(0.9);
     opacity: 0;
     pointer-events: none;
   }
   
   #chatbotContainer.open {
-    transform: translateY(0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
     pointer-events: auto;
   }
