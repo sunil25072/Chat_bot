@@ -1115,11 +1115,9 @@
   /* ── Chatbot Container ── */
   #chatbotContainer {
     position: fixed;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, 100%) scale(0.9);
-    width: 95vw;
-    max-width: 1400px;
+    right: 24px;
+    bottom: 24px;
+    width: 460px;
     height: 85vh;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -1132,23 +1130,26 @@
     z-index: 100;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(120%) scale(0.9);
     opacity: 0;
     pointer-events: none;
   }
   
   #chatbotContainer.open {
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateY(0) scale(1);
     opacity: 1;
     pointer-events: auto;
   }
   
   #chatbotContainer.maximized {
-    top: 50% !important;
+    top: 55% !important;
     left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
     transform: translate(-50%, -50%) scale(1) !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    border-radius: 0 !important;
+    width: 95vw !important;
+    max-width: 1400px !important;
+    height: 85vh !important;
   }
 
   #closeBtn, #newChatBtn {
@@ -1439,6 +1440,7 @@
       <textarea id="userInput" rows="1"
         placeholder="Ask about Systech's services, products, partners…"
         onkeydown="handleKey(event)"
+        onfocus="maximizeChat()"
         oninput="autoResize(this)"></textarea>
       <button id="sendBtn" onclick="sendMessage()" title="Send">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1962,14 +1964,27 @@ function toggleMaximize() {
   const restoreIcon = document.getElementById('restoreIcon');
   const isMax = container.classList.toggle('maximized');
   if (isMax) {
-    maxIcon.style.display = 'none';
-    restoreIcon.style.display = 'block';
+    if(maxIcon) maxIcon.style.display = 'none';
+    if(restoreIcon) restoreIcon.style.display = 'block';
   } else {
-    maxIcon.style.display = 'block';
-    restoreIcon.style.display = 'none';
+    if(maxIcon) maxIcon.style.display = 'block';
+    if(restoreIcon) restoreIcon.style.display = 'none';
   }
   autoResize(document.getElementById('userInput'));
   scrollChat();
+}
+
+function maximizeChat() {
+  const container = document.getElementById('chatbotContainer');
+  const maxIcon = document.getElementById('maxIcon');
+  const restoreIcon = document.getElementById('restoreIcon');
+  if (!container.classList.contains('maximized')) {
+    container.classList.add('maximized');
+    if(maxIcon) maxIcon.style.display = 'none';
+    if(restoreIcon) restoreIcon.style.display = 'block';
+    autoResize(document.getElementById('userInput'));
+    scrollChat();
+  }
 }
 
 
