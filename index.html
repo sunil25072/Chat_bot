@@ -1142,14 +1142,15 @@
   }
   
   #chatbotContainer.maximized {
-    top: 55% !important;
-    left: 50% !important;
-    right: auto !important;
-    bottom: auto !important;
-    transform: translate(-50%, -50%) scale(1) !important;
-    width: 95vw !important;
-    max-width: 1400px !important;
-    height: 85vh !important;
+    top: 85px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: none !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: calc(100vh - 85px) !important;
+    border-radius: 0 !important;
   }
 
   #closeBtn, #newChatBtn {
@@ -1393,7 +1394,7 @@
 </div>
 
 <!-- Chatbot Panel -->
-<div id="chatbotContainer">
+<div id="chatbotContainer" onclick="maximizeChat(event)">
   <!-- ── Header ── -->
   <header>
     <div style="display:flex; align-items:center; gap: 12px;">
@@ -1974,7 +1975,8 @@ function toggleMaximize() {
   scrollChat();
 }
 
-function maximizeChat() {
+function maximizeChat(event) {
+  if (event && event.target && event.target.closest('button')) return;
   const container = document.getElementById('chatbotContainer');
   const maxIcon = document.getElementById('maxIcon');
   const restoreIcon = document.getElementById('restoreIcon');
