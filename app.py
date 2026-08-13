@@ -421,6 +421,37 @@ async def chat_endpoint(req: ChatRequest):
         iteration = 0
         
         user_msg_lower = req.messages[-1].content.lower() if req.messages else ""
+        
+        # --- FAST RESPONSE INTERCEPTOR ---
+        quick_answers = {
+            "databricks lakebase services": "**Databricks Lakebase Services**\n\nSystech is a Launch Partner for Databricks Lakebase. We help organizations accelerate real-time AI and unify their data ecosystem using Lakebase and Unity Catalog. Our experts ensure seamless integration, robust governance, and optimized performance for your Databricks environment.",
+            "what is dbshift™?": "**What is DBShift™?**\n\nDBShift™ is Systech's Agentic Database Migration Accelerator. It leverages Generative AI to provide rapid, guaranteed migration from legacy data workloads to modern cloud platforms like Snowflake and Databricks, drastically reducing migration time, cost, and risk.",
+            "wizard™ capabilities": "**WizarD™ Capabilities**\n\nWizarD™ is our suite of AI-powered solutions:\n\n*   **WizarD™ DocPro AI** for unlocking tailored, on-demand insights through smart reporting.\n*   **WizarD™ VisionPro AI** for redefining risk and safety using computer vision and advanced analytics.",
+            "enterprise ai offerings": "**Enterprise AI Offerings**\n\nSystech's Enterprise AI offerings help businesses harness the power of Generative AI and Copilots to reshape analytics and drive growth. We offer strategy, implementation, and tailored AI solutions to create customer-centric supply chains and accelerate real-time decision-making.",
+            "snowflake partnership": "**Snowflake Partnership**\n\nSystech is a proud Snowflake partner. We help enterprises modernize their legacy data workloads using DBShift™ and Snowflake. We specialize in Snowflake Governance, data monetization, and seamlessly integrating the AI Data Cloud with tools like Snowflake Openflow.",
+            "industries systech serves": "**Industries Systech Serves**\n\nSystech provides tailored data and AI solutions across a wide range of industries, including:\n\n*   Banking and Financial Services\n*   Retail\n*   Healthcare\n*   Manufacturing\n*   Gaming\n\nWe help organizations in these sectors drive digital transformation, improve customer experiences, and unlock data monetization."
+        }
+        
+        if user_msg_lower in quick_answers:
+            final_answer = quick_answers[user_msg_lower]
+            
+            # Log to PostgreSQL
+            if db_pool and req.messages:
+                user_msgs = [m.content for m in req.messages if m.role == 'user']
+                if user_msgs:
+                    last_question = user_msgs[-1][:250]
+                    try:
+                        async with db_pool.acquire() as conn:
+                            await conn.execute(
+                                "INSERT INTO chat_bot (question, answer) VALUES ($1, $2)",
+                                last_question, final_answer
+                            )
+                    except Exception as e:
+                        print(f"Failed to log chat to PostgreSQL: {e}")
+            
+            return {"response": final_answer}
+        # --------------------------------
+        
         should_use_tools = not ("customer" in user_msg_lower or "client" in user_msg_lower)
         
         while iteration < max_iterations:
