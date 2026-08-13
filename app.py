@@ -29,8 +29,29 @@ app.add_middleware(
 
 import os
 from dotenv import load_dotenv
+import asyncpg
 
 load_dotenv()
+
+db_pool = None
+
+@app.on_event("startup")
+async def startup():
+    global db_pool
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        try:
+            db_pool = await asyncpg.create_pool(database_url)
+            async with db_pool.acquire() as conn:
+                await conn.execute('''
+                    CREATE TABLE IF NOT EXISTS chat_bot (
+                        question varchar(250),
+                        answer text
+                    )
+                ''')
+            print("Connected to PostgreSQL and ensured chat_bot table exists.")
+        except Exception as e:
+            print(f"Failed to connect to PostgreSQL: {e}")
 
 # 1. Initialize Azure OpenAI client
 try:
@@ -449,7 +470,23 @@ async def chat_endpoint(req: ChatRequest):
                 # Loop continues, sending the tool outputs back to the model
             else:
                 # No more tool calls, we have our final answer
-                return {"response": response_message.content}
+                final_answer = response_message.content
+                
+                # Log to PostgreSQL
+                if db_pool and req.messages:
+                    user_msgs = [m.content for m in req.messages if m.role == 'user']
+                    if user_msgs:
+                        last_question = user_msgs[-1][:250]  # Truncate to match varchar(250)
+                        try:
+                            async with db_pool.acquire() as conn:
+                                await conn.execute(
+                                    "INSERT INTO chat_bot (question, answer) VALUES ($1, $2)",
+                                    last_question, final_answer
+                                )
+                        except Exception as e:
+                            print(f"Failed to log chat to PostgreSQL: {e}")
+                            
+                return {"response": final_answer}
                 
         # If we exit the loop due to max_iterations
         return {"response": "I'm sorry, I needed to search too many pages to find the answer and timed out. Could you please provide a more specific question?"}
