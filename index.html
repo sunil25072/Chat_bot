@@ -1995,6 +1995,9 @@ function maximizeChat(event) {
 
 
 function handleOutsideClick(event) {
+  // Ignore the click if the target is no longer in the document (e.g., deleted chips)
+  if (!document.body.contains(event.target)) return;
+
   const container = document.getElementById('chatbotContainer');
   const trigger = document.getElementById('chatTrigger');
   
