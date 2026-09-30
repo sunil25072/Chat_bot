@@ -1432,8 +1432,6 @@
         <div class="chip" onclick="useChip(this)">Enterprise AI offerings</div>
         <div class="chip" onclick="useChip(this)">Snowflake partnership</div>
         <div class="chip" onclick="useChip(this)">Industries Systech serves</div>
-        <div class="chip" onclick="useChip(this)">DBShift migration metrics</div>
-        <div class="chip" onclick="useChip(this)">Managed services offered</div>
       </div>
     </div>
   </div>
@@ -1459,6 +1457,45 @@
 </div>
 
 <script>
+// --- WizarD Auth Intercept ---
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const ticket = params.get('ticket');
+  if (ticket) {
+    fetch('http://127.0.0.1:8000/api/auth/validate-sso', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticket }),
+      credentials: 'omit'
+    }).then(res => res.json()).then(data => {
+      if (data.success) {
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userName', data.name);
+        localStorage.setItem('userId', data.userId);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        location.reload();
+      } else {
+        alert("SSO Login failed");
+      }
+    });
+  } else if (params.get('msal_success') === 'true') {
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userName', params.get('name'));
+    localStorage.setItem('userId', params.get('userId'));
+    window.history.replaceState({}, document.title, window.location.pathname);
+    location.reload();
+  }
+})();
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('isAuthenticated') !== 'true') {
+        const inputRow = document.querySelector('.input-row');
+        if (inputRow) {
+            inputRow.innerHTML = '<button onclick="window.location.href=\'http://127.0.0.1:8000/api/auth/login\'" style="width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: Poppins, sans-serif; font-size: 15px; font-weight: 500;">Continue with Microsoft</button>';
+        }
+    }
+});
+
 // ══════════════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════════════
@@ -1854,7 +1891,7 @@ async function callBackend(query) {
     { role: 'user', content: query }
   ];
 
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages }) });
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages }), credentials: 'include' });
   if (!res.ok) { const t = await res.text(); throw new Error(`Backend Error ${res.status}: ${t}`); }
   const data = await res.json();
   return data.response;
@@ -1869,7 +1906,7 @@ async function sendMessage() {
   const inp   = document.getElementById('userInput');
   const query = inp.value.trim();
   if (!query || busy) return;
-  if (!CFG.apikey) { alert('Please configure your credentials first.'); openConfig(); return; }
+  if (!CFG.apikey && CFG.mode !== 'backend') { alert('Please configure your credentials first.'); openConfig(); return; }
 
   inp.value = ''; inp.style.height = 'auto';
   busy = true;
